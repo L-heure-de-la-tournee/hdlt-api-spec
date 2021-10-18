@@ -32,6 +32,14 @@ Nous voilà donc partie, ce dépôt sera la première pierre de l'édifice !
 ## Ce dépôt
 
 Ce dépôt contient le fichier `hdlt-api.yaml`, qui décrit au format OpenAPI 3 le fonctionnement (en français :fr:) de l'API d'HDLT.
+Le fichier étant peut digeste, on sortira très vite une documentation généré par Swagger UI, RapiDoc, autre...
+
 C'est aussi un dépôt on l'on apprend, étant donnée qu'à l'heure ou j'écris ces lignes, je ne sais pas comment sa s'écrit.
 
-Et le reste des dépôts à venir, il existera plusieurs "visualisateur" de cette documentation (Swagger UI, RapiDoc...).
+## Conventions
+
+Ce dépôt essaye d'être le plus propre possible, et nous vous incitons à en faire de même en utilisant le *workflow* [git-flow](https://www.atlassian.com/fr/git/tutorials/comparing-workflows/gitflow-workflow).
+Il s'appuie sur les branches et est utilisé sur des gros projets. Ce n'est pas le cas ici, mais ça permet d'avoir les bonne pratiques.
+
+Heureusement, il existe des extensions git pour gérer les branches à notre place (voir gitflow).
+
