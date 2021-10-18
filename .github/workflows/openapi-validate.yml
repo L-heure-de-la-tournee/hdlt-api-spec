@@ -1,0 +1,15 @@
+on: [push, pull_request]
+name: Validate API documentation
+jobs:
+  validate:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Get OpenAPI files
+      uses: actions/checkout@v2
+    - name: swagger-validator
+      uses: mbowman100/swagger-validator-action@master
+      with:
+        files: | 
+          ./openapi.yaml
