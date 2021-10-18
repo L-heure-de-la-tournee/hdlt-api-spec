@@ -1,0 +1,302 @@
+openapi: 3.0.1
+info:
+  title: L'Heure De La Tournée - Description de l'API
+  version: '0.1.0'
+  description: >-
+    Cette documentation reflète le fonctionnement de l'Heure De La Tournée, un projet universitaire multi frontend et multi backend pour apprendre à utiliser des technologies du web moderne en séparant le front et le back.
+    Que vous développiez un frontend ou un backend, il doit être conforme à cette documentation pour être compatible avec n'importe quelle autre backend/frontend.
+    HDLT est un service ou l'on s'inscrit et déclare des changements de status. 1 changement de status = 1 tournée !
+  contact:
+    name: Sinux
+    email: hdlt@sinux.sh
+  license:
+    name: MIT License
+    url: https://opensource.org/licenses/MIT
+paths:
+  /login:
+    post:
+      summary: User login
+      operationId: loginUser
+      description: |-
+        Permet à un utilisateur de se connecter avec ses identifiants. 
+        S'ils sont correctes, il reçoit en retour un token JWT.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginCredential'
+        required: true
+      tags:
+        - Auth
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthToken'
+          description: successful operation
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /register:
+    post:
+      summary: Enregistrer un utilisateur
+      operationId: registerUser
+      description: |-
+        Permet à un utilisateur de s'enregistrer auprès du backend.
+        Le 1er utilisateur à s'enregistrer est administrateur, les autres sont de simple utilisateurs.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistration'
+        required: true
+      tags:
+        - Auth
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserModel'
+          description: successful operation
+        '400':
+          description: Invalid request
+  /token:
+    post:
+      summary: Rafraichi le token de l'utilisateur
+      operationId: refreshToken
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshToken'
+        required: true
+      tags:
+        - Auth
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthToken'
+          description: successful operation
+        '401':
+          description: Unauthorized
+  /users:
+    get:
+      summary: Liste d'utilisateurs
+      operationId: getUserList
+      description: Récupère la liste des utilisateurs
+      tags:
+        - Users
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserModel'
+          description: successful operation
+        '401':
+          description: Unauthorized user
+      security:
+        - JWTAuth: []
+  /users/{userId}:
+    get:
+      summary: Trouver un utilisateur avec son ID
+      operationId: getUserById
+      description: Renvoie les données d'un utilisateur bien particulier
+      tags:
+        - Users
+      parameters:
+        - name: userId
+          description: ID de l'utilisateur à retourner
+          schema:
+            format: int64
+            type: integer
+          in: path
+          required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserModel'
+          description: successful operation
+        '401':
+          description: Unauthorized user
+        '404':
+          description: User not found
+      security:
+        - JWTAuth: []
+    put:
+      summary: Mettre à jour un utilisateur 
+      operationId: updateUser
+      description: Met à jour les informations personnelles d'un utilisateur
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdateData'
+        required: true
+      tags:
+        - Users
+      parameters:
+        - name: userId
+          description: ID de l'utilisateur à modifier
+          schema:
+            format: int64
+            type: integer
+          in: path
+          required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserModel'
+          description: successful operation
+        '401':
+          description: Unauthorized user
+        '404':
+          description: User not found
+      security:
+        - JWTAuth: []
+    delete:
+      summary: Supprimer un utilisateur
+      operationId: deleteUser
+      description: |-
+        Supprime un utilisateur depuis son ID.
+        Seul l'utilisateur en question ou un administrateur peut faire ça.
+      tags:
+        - Users
+      parameters:
+        - name: userId
+          description: ID de l'utilisateur à supprimer
+          schema:
+            format: int64
+            type: integer
+          in: path
+          required: true
+      responses:
+        '204':
+          description: successful operation
+      security:
+        - JWTAuth: []
+components:
+  schemas:
+    UserRegistration:
+      required:
+        - name
+        - email
+        - password
+      type: object
+      properties:
+        name:
+          format: string
+          type: string
+        email:
+          format: email
+          type: string
+        password:
+          format: string
+          type: string
+          minLength: 6
+    AuthToken:
+      required:
+        - access_token
+        - refresh_token
+      type: object
+      properties:
+        access_token:
+          format: string
+          type: string
+        refresh_token:
+          format: string
+          type: string
+    RefreshToken:
+      required:
+        - token
+      type: object
+      properties:
+        token:
+          format: string
+          type: string
+    LoginCredential:
+      required:
+        - email
+        - password
+      type: object
+      properties:
+        email:
+          format: email
+          type: string
+        password:
+          format: string
+          type: string
+          minLength: 6
+    UserUpdateData:
+      type: object
+      properties:
+        name:
+          format: string
+          type: string
+        email:
+          format: email
+          type: string
+        password:
+          format: password
+          type: string
+          minLength: 6
+      required:
+        - name
+        - email
+    UserModel:
+      type: object
+      properties:
+        id:
+          format: int32
+          type: integer
+        name:
+          format: string
+          type: string
+        email:
+          format: email
+          type: string
+        roles:
+          format: string
+          type: string
+        is_active:
+          type: boolean
+        created_at:
+          format: date-time
+          type: string
+        updated_at:
+          format: date-time
+          type: string
+      required: 
+        - id
+        - name
+        - email
+        - roles
+        - is_active
+  securitySchemes:
+    JWTAuth:
+      scheme: bearer
+      bearerFormat: JWT
+      type: http
+      description: |-
+        Example: 
+        > Authorization: Bearer <token>
+  headers: {}
+  responses: {}
+  parameters: {}
+tags:
+  - name: Auth
+    description: Authentification JWT
+  - name: Users
+    description: Opération sur les utilisateurs
+security: []
