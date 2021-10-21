@@ -15,6 +15,24 @@ info:
     name: MIT License
     url: https://opensource.org/licenses/MIT
 paths:
+  /version:
+    get:
+      summary: Version de l'API
+      description: Renvoie la version de l'API qu'utilise le backend
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  version:
+                    format: version
+                    type: string
+                    example: "1.17.1"
+                required:
+                  - version
   /login:
     post:
       summary: Connecter un utilisateur
