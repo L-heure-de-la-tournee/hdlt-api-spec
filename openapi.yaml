@@ -2,9 +2,11 @@ openapi: 3.0.1
 info:
   title: L'Heure De La Tournée - Description de l'API
   version: '0.1.0'
-  description: >-
+  description: |
     Cette documentation reflète le fonctionnement de l'Heure De La Tournée, un projet universitaire multi frontend et multi backend pour apprendre à utiliser des technologies du web moderne en séparant le front et le back.
+
     Que vous développiez un frontend ou un backend, il doit être conforme à cette documentation pour être compatible avec n'importe quelle autre backend/frontend.
+
     HDLT est un service ou l'on s'inscrit et déclare des changements de status. 1 changement de status = 1 tournée !
   contact:
     name: Sinux
@@ -15,7 +17,7 @@ info:
 paths:
   /login:
     post:
-      summary: User login
+      summary: Connecter un utilisateur
       operationId: loginUser
       description: |-
         Permet à un utilisateur de se connecter avec ses identifiants. 
@@ -27,7 +29,7 @@ paths:
               $ref: '#/components/schemas/LoginCredential'
         required: true
       tags:
-        - Auth
+        - Authentification
       responses:
         '200':
           content:
@@ -36,10 +38,53 @@ paths:
                 $ref: '#/components/schemas/AuthToken'
           description: successful operation
         '400':
-          description: Invalid request
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Unauthorized
-  /register:
+          $ref: '#/components/responses/Unauthorized'
+  /token:
+    post:
+      summary: Rafraichi le token de l'utilisateur
+      operationId: refreshToken
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshToken'
+        required: true
+      tags:
+        - Authentification
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthToken'
+          description: successful operation
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /users:
+    get:
+      summary: Liste d'utilisateurs
+      operationId: getUserList
+      description: Récupère la liste des utilisateurs
+      tags:
+        - Utilisateurs
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UserModel'
+          description: successful operation
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      security:
+        - JWTAuth: []
     post:
       summary: Enregistrer un utilisateur
       operationId: registerUser
@@ -53,7 +98,7 @@ paths:
               $ref: '#/components/schemas/UserRegistration'
         required: true
       tags:
-        - Auth
+        - Utilisateurs
       responses:
         '200':
           content:
@@ -62,55 +107,14 @@ paths:
                 $ref: '#/components/schemas/UserModel'
           description: successful operation
         '400':
-          description: Invalid request
-  /token:
-    post:
-      summary: Rafraichi le token de l'utilisateur
-      operationId: refreshToken
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RefreshToken'
-        required: true
-      tags:
-        - Auth
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthToken'
-          description: successful operation
-        '401':
-          description: Unauthorized
-  /users:
-    get:
-      summary: Liste d'utilisateurs
-      operationId: getUserList
-      description: Récupère la liste des utilisateurs
-      tags:
-        - Users
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/UserModel'
-          description: successful operation
-        '401':
-          description: Unauthorized user
-      security:
-        - JWTAuth: []
+          $ref: '#/components/responses/BadRequest'
   /users/{userId}:
     get:
       summary: Trouver un utilisateur avec son ID
       operationId: getUserById
       description: Renvoie les données d'un utilisateur bien particulier
       tags:
-        - Users
+        - Utilisateurs
       parameters:
         - name: userId
           description: ID de l'utilisateur à retourner
@@ -127,9 +131,9 @@ paths:
                 $ref: '#/components/schemas/UserModel'
           description: successful operation
         '401':
-          description: Unauthorized user
+          $ref: '#/components/responses/Unauthorized'
         '404':
-          description: User not found
+          $ref: '#/components/responses/NotFound'
       security:
         - JWTAuth: []
     put:
@@ -143,7 +147,7 @@ paths:
               $ref: '#/components/schemas/UserUpdateData'
         required: true
       tags:
-        - Users
+        - Utilisateurs
       parameters:
         - name: userId
           description: ID de l'utilisateur à modifier
@@ -160,9 +164,9 @@ paths:
                 $ref: '#/components/schemas/UserModel'
           description: successful operation
         '401':
-          description: Unauthorized user
+          $ref: '#/components/responses/Unauthorized'
         '404':
-          description: User not found
+          $ref: '#/components/responses/NotFound'
       security:
         - JWTAuth: []
     delete:
@@ -172,7 +176,7 @@ paths:
         Supprime un utilisateur depuis son ID.
         Seul l'utilisateur en question ou un administrateur peut faire ça.
       tags:
-        - Users
+        - Utilisateurs
       parameters:
         - name: userId
           description: ID de l'utilisateur à supprimer
@@ -183,7 +187,58 @@ paths:
           required: true
       responses:
         '204':
+          $ref: '#/components/responses/NoContent'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+        - JWTAuth: []
+  /laws:
+    get:
+      summary: Liste des changements de status possible
+      operationId: getLawsList
+      description: |-
+        Récupère la liste des lois, c'est à dire la liste des articles.
+
+        Elles sont écrites en dure, non modifiables et écrites pour l'homme.
+      tags:
+        - Lois
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  laws:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/LawModel'
           description: successful operation
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      security:
+        - JWTAuth: []
+  /status:
+    get:
+      summary: Liste des tournées
+      operationId: getStatusList
+      description: Récupère la liste des status, le plus récent en premier
+      tags:
+        - Statuts
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/StatusModel'
+          description: successful operation
+        '401':
+          $ref: '#/components/responses/Unauthorized'
       security:
         - JWTAuth: []
 components:
@@ -283,6 +338,129 @@ components:
         - email
         - roles
         - is_active
+    LawModel:
+      type: object
+      properties:
+        id:
+          format: int32
+          type: integer
+        name:
+          format: string
+          type: string
+        description:
+          format: string
+          type: string
+        created_at:
+          format: date-time
+          type: string
+        updated_at:
+          format: date-time
+          type: string
+      required:
+        - id
+        - name
+        - description
+    StatusModel:
+      type: object
+      properties:
+        id:
+          format: int32
+          type: integer
+        lawId:
+          format: lawId
+          type: integer
+        description:
+          format: string
+          type: string
+        date:
+          format: date-time
+          type: string
+        created_at:
+          format: date-time
+          type: string
+        updated_at:
+          format: date-time
+          type: string
+      required:
+        - id
+        - lawId
+        - description
+        - date
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+          example: '404'
+        message:
+          oneOf:
+            - type: string
+              format: error_description
+            - type: array
+              items:
+                type: string
+                format: error_description
+      required:
+        - code
+        - message
+
+  responses:
+    NotFound:
+      description: La ressource n'a pas été trouvé
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            OneError:
+              $ref: '#/components/examples/OneNotFound'
+    Unauthorized:
+      description: Vous n'avez pas la permission pour cette action
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            OneError:
+              $ref: '#/components/examples/OneUnauthorized'
+    BadRequest:
+      description: La requête n'est pas valide
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            MultipleErrors:
+              $ref: '#/components/examples/MultipleBadRequest'
+            OneError:
+              $ref: '#/components/examples/OneBadRequest'
+    NoContent:
+      description: La requête a été accepter, pas de données supplémentaires
+
+  examples:
+    OneNotFound:
+      summary: Non trouvé
+      value:
+        code: '404'
+        message: "La ressource n'existe pas"
+    OneUnauthorized:
+      summary: Pas la permission
+      value:
+        code: '401'
+        message: "Vous n'avez pas la permission pour cette action"
+    OneBadRequest:
+      summary: Requête incorrect, une seule erreur
+      value:
+        code: '400'
+        message: "Il manque un champ"
+    MultipleBadRequest:
+      summary: Requête incorrect, plusieurs erreurs
+      value:
+        code: '400'
+        message:
+          - "Un champ n'est pas du bon type"
+          - "Il manque un champ"
+
   securitySchemes:
     JWTAuth:
       scheme: bearer
@@ -292,11 +470,14 @@ components:
         Example: 
         > Authorization: Bearer <token>
   headers: {}
-  responses: {}
   parameters: {}
 tags:
-  - name: Auth
+  - name: Authentification
     description: Authentification JWT
-  - name: Users
-    description: Opération sur les utilisateurs
+  - name: Utilisateurs
+    description: Opérations sur les utilisateurs
+  - name: Statuts
+    description: Opérations sur les statuts
+  - name: Lois
+    description: Opérations sur les lois
 security: []
