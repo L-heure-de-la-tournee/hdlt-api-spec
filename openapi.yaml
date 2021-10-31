@@ -259,6 +259,27 @@ paths:
           $ref: '#/components/responses/Unauthorized'
       security:
         - JWTAuth: []
+    post:
+      summary: Déclarer changement statuts
+      operationId: registerStatus
+      description: Déclare le changement de statuts d'un utilisateur
+      tags:
+        - Statuts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatusRegistration'
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusModel'
+      security:
+        - JWTAuth: []
 components:
   schemas:
     UserRegistration:
@@ -278,6 +299,22 @@ components:
           format: string
           type: string
           minLength: 6
+    StatusRegistration:
+      required:
+        - lawId
+        - description
+        - date
+      type: object
+      properties:
+        lawId:
+          format: int32
+          type: integer
+        description:
+          format: string
+          type: string
+        date:
+          format: date-time
+          type: string
     AuthToken:
       required:
         - access_token
@@ -499,3 +536,4 @@ tags:
   - name: Lois
     description: Opérations sur les lois
 security: []
+
