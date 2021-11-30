@@ -278,6 +278,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StatusModel'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      security:
+        - JWTAuth: []
+    put:
+      summary: Valider une tournée
+      operationId: updateStatus
+      description: Déclarer qu'un tournée a été payé
+      tags:
+        - Statuts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatusUpdate'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusModel'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
       security:
         - JWTAuth: []
 components:
@@ -315,6 +339,22 @@ components:
         date:
           format: date-time
           type: string
+        paye:
+          format: boolean
+          type: boolean
+          default: false
+    StatusUpdate:
+      required:
+        - statusId
+        - paye
+      type: object
+      properties:
+        statusId:
+          format: int32
+          type: integer
+        paye:
+          format: boolean
+          type: boolean
     AuthToken:
       required:
         - access_token
@@ -430,6 +470,9 @@ components:
         date:
           format: date-time
           type: string
+        paye:
+          format: boolean
+          type: boolean
         created_at:
           format: date-time
           type: string
@@ -441,6 +484,7 @@ components:
         - lawId
         - description
         - date
+        - paye
     Error:
       type: object
       properties:
