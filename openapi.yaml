@@ -308,16 +308,12 @@ components:
   schemas:
     UserRegistration:
       required:
-        - name
-        - email
+        - login
         - password
       type: object
       properties:
-        name:
+        login:
           format: string
-          type: string
-        email:
-          format: email
           type: string
         password:
           format: string
@@ -377,12 +373,12 @@ components:
           type: string
     LoginCredential:
       required:
-        - email
+        - login
         - password
       type: object
       properties:
-        email:
-          format: email
+        login:
+          format: string
           type: string
         password:
           format: string
@@ -391,30 +387,21 @@ components:
     UserUpdateData:
       type: object
       properties:
-        name:
+        login:
           format: string
-          type: string
-        email:
-          format: email
           type: string
         password:
           format: password
           type: string
           minLength: 6
-      required:
-        - name
-        - email
     UserModel:
       type: object
       properties:
         id:
           format: int32
           type: integer
-        name:
+        login:
           format: string
-          type: string
-        email:
-          format: email
           type: string
         roles:
           format: string
@@ -429,8 +416,7 @@ components:
           type: string
       required: 
         - id
-        - name
-        - email
+        - login
         - roles
         - is_active
     LawModel:
