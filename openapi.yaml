@@ -243,6 +243,16 @@ paths:
       description: Récupère la liste des status, le plus récent en premier
       tags:
         - Statuts
+      parameters:
+        - in: query
+          name: paye
+          schema:
+            type: boolean
+            format: boolean
+            nullable: true
+            default: null
+          required: false
+          description: Filtre les statuts qui ont été payé ou non. Si non spécifié, renvoie tous les statuts.
       responses:
         '200':
           content:
@@ -566,4 +576,5 @@ tags:
   - name: Lois
     description: Opérations sur les lois
 security: []
+
 
