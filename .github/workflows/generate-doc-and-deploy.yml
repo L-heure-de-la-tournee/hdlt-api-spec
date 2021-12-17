@@ -1,0 +1,28 @@
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+
+  generate-doc-and-deploy:
+
+    runs-on: ubuntu-latest
+    name: Generate documentation with Swagger UI & deploy to Github Pages branch
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Swagger UI Action
+        uses: Legion2/swagger-ui-action@v1.1.3
+        with:
+          output: doc
+          spec-file: openapi.yaml
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: doc
