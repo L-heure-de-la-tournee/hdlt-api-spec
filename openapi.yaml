@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: L'Heure De La Tournée - Description de l'API
-  version: '0.1.0'
+  version: '1.0.0'
   description: |
     Cette documentation reflète le fonctionnement de l'Heure De La Tournée, un projet universitaire multi frontend et multi backend pour apprendre à utiliser des technologies du web moderne en séparant le front et le back.
 
@@ -30,7 +30,7 @@ paths:
                   version:
                     format: version
                     type: string
-                    example: "1.17.1"
+                    example: "1.0.0"
                 required:
                   - version
   /login:
