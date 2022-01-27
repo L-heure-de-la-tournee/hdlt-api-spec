@@ -53,7 +53,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthToken'
+                $ref: '#/components/schemas/Token'
           description: successful operation
         '400':
           $ref: '#/components/responses/BadRequest'
@@ -62,12 +62,14 @@ paths:
   /token:
     post:
       summary: Rafraichi le token de l'utilisateur
+      description: |-
+        Envoyez votre token d'authentification ici avant qu'il n'expire pour le renouveler.
       operationId: refreshToken
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/RefreshToken'
+              $ref: '#/components/schemas/Token'
         required: true
       tags:
         - Authentification
@@ -76,7 +78,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthToken'
+                $ref: '#/components/schemas/Token'
           description: successful operation
         '401':
           $ref: '#/components/responses/Unauthorized'
@@ -361,25 +363,13 @@ components:
         paye:
           format: boolean
           type: boolean
-    AuthToken:
-      required:
-        - access_token
-        - refresh_token
-      type: object
-      properties:
-        access_token:
-          format: string
-          type: string
-        refresh_token:
-          format: string
-          type: string
-    RefreshToken:
+    Token:
       required:
         - token
       type: object
       properties:
         token:
-          format: string
+          format: jwtToken
           type: string
     LoginCredential:
       required:
