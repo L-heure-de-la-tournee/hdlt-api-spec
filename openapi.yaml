@@ -102,7 +102,7 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
       security:
-        - JWTAuth: []
+        - bearerAuth: []
     post:
       summary: Enregistrer un utilisateur
       operationId: registerUser
@@ -153,7 +153,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
       security:
-        - JWTAuth: []
+        - bearerAuth: []
     put:
       summary: Mettre à jour un utilisateur 
       operationId: updateUser
@@ -186,7 +186,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
       security:
-        - JWTAuth: []
+        - bearerAuth: []
     delete:
       summary: Supprimer un utilisateur
       operationId: deleteUser
@@ -209,7 +209,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
       security:
-        - JWTAuth: []
+        - bearerAuth: []
   /laws:
     get:
       summary: Liste des changements de status possible
@@ -235,7 +235,7 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
       security:
-        - JWTAuth: []
+        - bearerAuth: []
   /status:
     get:
       summary: Liste des tournées
@@ -268,7 +268,7 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
       security:
-        - JWTAuth: []
+        - bearerAuth: []
     post:
       summary: Déclarer changement statuts
       operationId: registerStatus
@@ -291,7 +291,7 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
       security:
-        - JWTAuth: []
+        - bearerAuth: []
     put:
       summary: Valider une tournée
       operationId: updateStatus
@@ -313,7 +313,7 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
       security:
-        - JWTAuth: []
+        - bearerAuth: []
 components:
   schemas:
     UserRegistration:
@@ -557,7 +557,7 @@ components:
           - "Il manque un champ"
 
   securitySchemes:
-    JWTAuth:
+    bearerAuth:
       scheme: bearer
       bearerFormat: JWT
       type: http
