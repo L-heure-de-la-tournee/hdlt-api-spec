@@ -132,7 +132,7 @@ paths:
     get:
       summary: Trouver un utilisateur avec son ID
       operationId: getUserById
-      description: Renvoie les données d'un utilisateur bien particulier
+      description: Renvoie les données d'un utilisateur
       tags:
         - Utilisateurs
       parameters:
@@ -164,7 +164,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserUpdateData'
+              $ref: '#/components/schemas/UserUpdate'
         required: true
       tags:
         - Utilisateurs
@@ -212,6 +212,42 @@ paths:
           $ref: '#/components/responses/NotFound'
       security:
         - bearerAuth: []
+  /users/{userId}/status:
+    get:
+      summary: Renvoie les statuts de l'utilisateur
+      operationId: getStatusByUser
+      description: Renvoie les statuts d'un utilisateur
+      tags:
+        - Utilisateurs
+      parameters:
+        - name: userId
+          description: ID de l'utilisateur
+          schema:
+            format: int64
+            type: integer
+          in: path
+          required: true
+        - name: paye
+          description: Filtre les statuts payés, impayés ou tous
+          schema:
+            type: boolean
+            nullable: true
+            default: null
+          in: query
+          required: false
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserModel'
+          description: successful operation
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+        - bearerAuth: []
   /laws:
     get:
       summary: Liste des changements de status possible
@@ -240,7 +276,7 @@ paths:
         - bearerAuth: []
   /status:
     get:
-      summary: Liste des tournées
+      summary: Liste des statuts
       operationId: getStatusList
       description: Récupère la liste des status, le plus récent en premier
       tags:
@@ -294,17 +330,62 @@ paths:
           $ref: '#/components/responses/Unauthorized'
       security:
         - bearerAuth: []
+  /status/{idStatus}:
+    get:
+      summary: Retourne le statuts
+      operationId: getStatus
+      description: Renvoie une description complète du statuts
+      parameters:
+        - name: idStatus
+          description: ID du statuts
+          schema:
+            format: int64
+            type: integer
+          in: path
+          required: true
+      tags:
+        - Statuts
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/StatusModel'
+          description: successful operation
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      security:
+        - bearerAuth: []
     put:
-      summary: Valider une tournée
+      summary: Valider un statuts
       operationId: updateStatus
-      description: Déclarer qu'un tournée a été payé
+      description: Déclarer qu'un statuts a été (im)payé
+      parameters:
+        - name: idStatus
+          description: ID du statuts
+          schema:
+            format: int64
+            type: integer
+          in: path
+          required: true
       tags:
         - Statuts
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/StatusUpdate'
+              type: object
+              properties:
+                paye:
+                  type: boolean
+              required:
+                - paye
+        required: true
       responses:
         '200':
           description: successful operation
@@ -384,7 +465,7 @@ components:
           format: string
           type: string
           minLength: 6
-    UserUpdateData:
+    UserUpdate:
       type: object
       properties:
         login:
@@ -403,11 +484,6 @@ components:
         login:
           format: string
           type: string
-        roles:
-          format: string
-          type: string
-        is_active:
-          type: boolean
         created_at:
           format: date-time
           type: string
@@ -417,8 +493,6 @@ components:
       required: 
         - id
         - login
-        - roles
-        - is_active
     LawModel:
       type: object
       properties:
