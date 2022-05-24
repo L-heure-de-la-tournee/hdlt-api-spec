@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: L'Heure De La Tournée - Description de l'API
-  version: '1.0.0'
+  version: '1.1.0'
   description: |
     Cette documentation reflète le fonctionnement de l'Heure De La Tournée, un projet universitaire multi frontend et multi backend pour apprendre à utiliser des technologies du web moderne en séparant le front et le back.
 
@@ -152,62 +152,6 @@ paths:
           description: successful operation
         '401':
           $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-      security:
-        - bearerAuth: []
-    put:
-      summary: Mettre à jour un utilisateur 
-      operationId: updateUser
-      description: Met à jour les informations personnelles d'un utilisateur
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UserUpdate'
-        required: true
-      tags:
-        - Utilisateurs
-      parameters:
-        - name: userId
-          description: ID de l'utilisateur à modifier
-          schema:
-            format: int64
-            type: integer
-          in: path
-          required: true
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserModel'
-          description: successful operation
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-      security:
-        - bearerAuth: []
-    delete:
-      summary: Supprimer un utilisateur
-      operationId: deleteUser
-      description: |-
-        Supprime un utilisateur depuis son ID.
-        Seul l'utilisateur en question ou un administrateur peut faire ça.
-      tags:
-        - Utilisateurs
-      parameters:
-        - name: userId
-          description: ID de l'utilisateur à supprimer
-          schema:
-            format: int64
-            type: integer
-          in: path
-          required: true
-      responses:
-        '204':
-          $ref: '#/components/responses/NoContent'
         '404':
           $ref: '#/components/responses/NotFound'
       security:
