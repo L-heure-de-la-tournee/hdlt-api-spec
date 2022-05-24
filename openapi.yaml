@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: L'Heure De La Tournée - Description de l'API
-  version: '1.0.0'
+  version: '1.1.0'
   description: |
     Cette documentation reflète le fonctionnement de l'Heure De La Tournée, un projet universitaire multi frontend et multi backend pour apprendre à utiliser des technologies du web moderne en séparant le front et le back.
 
@@ -53,7 +53,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthToken'
+                $ref: '#/components/schemas/Token'
           description: successful operation
         '400':
           $ref: '#/components/responses/BadRequest'
@@ -62,12 +62,14 @@ paths:
   /token:
     post:
       summary: Rafraichi le token de l'utilisateur
+      description: |-
+        Envoyez votre token d'authentification ici avant qu'il n'expire pour le renouveler.
       operationId: refreshToken
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/RefreshToken'
+              $ref: '#/components/schemas/Token'
         required: true
       tags:
         - Authentification
@@ -76,7 +78,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthToken'
+                $ref: '#/components/schemas/Token'
           description: successful operation
         '401':
           $ref: '#/components/responses/Unauthorized'
@@ -102,7 +104,7 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
       security:
-        - JWTAuth: []
+        - bearerAuth: []
     post:
       summary: Enregistrer un utilisateur
       operationId: registerUser
@@ -130,7 +132,7 @@ paths:
     get:
       summary: Trouver un utilisateur avec son ID
       operationId: getUserById
-      description: Renvoie les données d'un utilisateur bien particulier
+      description: Renvoie les données d'un utilisateur
       tags:
         - Utilisateurs
       parameters:
@@ -153,27 +155,30 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
       security:
-        - JWTAuth: []
-    put:
-      summary: Mettre à jour un utilisateur 
-      operationId: updateUser
-      description: Met à jour les informations personnelles d'un utilisateur
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UserUpdateData'
-        required: true
+        - bearerAuth: []
+  /users/{userId}/status:
+    get:
+      summary: Renvoie les statuts de l'utilisateur
+      operationId: getStatusByUser
+      description: Renvoie les statuts d'un utilisateur
       tags:
         - Utilisateurs
       parameters:
         - name: userId
-          description: ID de l'utilisateur à modifier
+          description: ID de l'utilisateur
           schema:
             format: int64
             type: integer
           in: path
           required: true
+        - name: paye
+          description: Filtre les statuts payés, impayés ou tous
+          schema:
+            type: boolean
+            nullable: true
+            default: null
+          in: query
+          required: false
       responses:
         '200':
           content:
@@ -186,30 +191,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
       security:
-        - JWTAuth: []
-    delete:
-      summary: Supprimer un utilisateur
-      operationId: deleteUser
-      description: |-
-        Supprime un utilisateur depuis son ID.
-        Seul l'utilisateur en question ou un administrateur peut faire ça.
-      tags:
-        - Utilisateurs
-      parameters:
-        - name: userId
-          description: ID de l'utilisateur à supprimer
-          schema:
-            format: int64
-            type: integer
-          in: path
-          required: true
-      responses:
-        '204':
-          $ref: '#/components/responses/NoContent'
-        '404':
-          $ref: '#/components/responses/NotFound'
-      security:
-        - JWTAuth: []
+        - bearerAuth: []
   /laws:
     get:
       summary: Liste des changements de status possible
@@ -235,10 +217,10 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
       security:
-        - JWTAuth: []
+        - bearerAuth: []
   /status:
     get:
-      summary: Liste des tournées
+      summary: Liste des statuts
       operationId: getStatusList
       description: Récupère la liste des status, le plus récent en premier
       tags:
@@ -268,7 +250,7 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
       security:
-        - JWTAuth: []
+        - bearerAuth: []
     post:
       summary: Déclarer changement statuts
       operationId: registerStatus
@@ -291,18 +273,63 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
       security:
-        - JWTAuth: []
+        - bearerAuth: []
+  /status/{idStatus}:
+    get:
+      summary: Retourne le statuts
+      operationId: getStatus
+      description: Renvoie une description complète du statuts
+      parameters:
+        - name: idStatus
+          description: ID du statuts
+          schema:
+            format: int64
+            type: integer
+          in: path
+          required: true
+      tags:
+        - Statuts
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/StatusModel'
+          description: successful operation
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      security:
+        - bearerAuth: []
     put:
-      summary: Valider une tournée
+      summary: Valider un statuts
       operationId: updateStatus
-      description: Déclarer qu'un tournée a été payé
+      description: Déclarer qu'un statuts a été (im)payé
+      parameters:
+        - name: idStatus
+          description: ID du statuts
+          schema:
+            format: int64
+            type: integer
+          in: path
+          required: true
       tags:
         - Statuts
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/StatusUpdate'
+              type: object
+              properties:
+                paye:
+                  type: boolean
+              required:
+                - paye
+        required: true
       responses:
         '200':
           description: successful operation
@@ -313,7 +340,7 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
       security:
-        - JWTAuth: []
+        - bearerAuth: []
 components:
   schemas:
     UserRegistration:
@@ -361,25 +388,13 @@ components:
         paye:
           format: boolean
           type: boolean
-    AuthToken:
-      required:
-        - access_token
-        - refresh_token
-      type: object
-      properties:
-        access_token:
-          format: string
-          type: string
-        refresh_token:
-          format: string
-          type: string
-    RefreshToken:
+    Token:
       required:
         - token
       type: object
       properties:
         token:
-          format: string
+          format: jwtToken
           type: string
     LoginCredential:
       required:
@@ -394,7 +409,7 @@ components:
           format: string
           type: string
           minLength: 6
-    UserUpdateData:
+    UserUpdate:
       type: object
       properties:
         login:
@@ -413,11 +428,6 @@ components:
         login:
           format: string
           type: string
-        roles:
-          format: string
-          type: string
-        is_active:
-          type: boolean
         created_at:
           format: date-time
           type: string
@@ -427,8 +437,6 @@ components:
       required: 
         - id
         - login
-        - roles
-        - is_active
     LawModel:
       type: object
       properties:
@@ -557,7 +565,7 @@ components:
           - "Il manque un champ"
 
   securitySchemes:
-    JWTAuth:
+    bearerAuth:
       scheme: bearer
       bearerFormat: JWT
       type: http
